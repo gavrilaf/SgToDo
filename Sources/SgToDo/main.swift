@@ -1,10 +1,6 @@
 import Seagull
 import NIOHTTP1
 
-func pingHandler(_ request: SgRequest, _ ctx: SgRequestContext) -> SgResult {
-    let status = ["active": true]
-    return ctx.encode(dict: status)
-}
 
 let logger = DefaultLogger()
 
@@ -13,10 +9,12 @@ do {
     
     var router = Router()
     
-    try router.add(method: .GET, relativePath: "/ping", handler: pingHandler)
+    try router.add(method: .GET, relativePath: "/:file", handler: Handlers.staticPage)
     
-    let engine = Engine(router: router)
-    try engine.run(host: "localhost", port: 8010)
+    try router.add(method: .GET, relativePath: "/api/v1/ping", handler: Handlers.ping)
+
+    let engine = Engine(router: router, logger: logger)
+    try engine.run(host: "0.0.0.0", port: 8012)
     
     defer { try! engine.close() }
     try engine.waitForCompletion()

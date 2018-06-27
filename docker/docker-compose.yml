@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+
+  runtime-setup:
+    image: swift-nio:default
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  common: &common
+    image: swift-nio:default
+    depends_on: [runtime-setup]
+    volumes:
+      - ~/.ssh:/root/.ssh
+      - ..:/code
+    working_dir: /code
+
+  todo-srv:
+    <<: *common
+    tty: true
+    ports:
+      - "8012:8012"
+    command: /bin/bash -cl "swift run SgToDo"
